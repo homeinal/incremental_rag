@@ -22,6 +22,7 @@ Instructions:
 3. If the context doesn't fully answer the question, acknowledge limitations
 4. Keep the response focused and informative
 5. Do not make up information not present in the context
+6. IMPORTANT: Respond in the same language as the user's question. If the question is in Korean, respond in Korean. If the question is in English, respond in English.
 
 Response:"""
 
@@ -70,7 +71,7 @@ class LLMResponderService:
                 ))
 
         if not context_parts:
-            return self._not_found_response(), []
+            return self._not_found_response(query), []
 
         context = "\n\n---\n\n".join(context_parts)
         client = get_openai_client()
@@ -100,8 +101,14 @@ class LLMResponderService:
             logger.error(f"Response generation failed: {e}")
             return f"I encountered an error generating a response: {str(e)}", sources
 
-    def _not_found_response(self) -> str:
-        """Generate a not-found response"""
+    def _not_found_response(self, query: str = "") -> str:
+        """Generate a not-found response in the appropriate language"""
+        # Simple Korean detection: check for Korean characters
+        if query and any('\uac00' <= char <= '\ud7a3' for char in query):
+            return (
+                "질문에 대한 관련 정보를 찾을 수 없습니다. "
+                "질문을 다르게 표현하거나 AI 및 머신러닝 연구와 관련된 다른 주제로 질문해 주세요."
+            )
         return (
             "I couldn't find relevant information to answer your question. "
             "Try rephrasing your query or asking about a different topic related to AI and machine learning research."
