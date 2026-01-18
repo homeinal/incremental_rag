@@ -10,7 +10,7 @@ from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-ARXIV_API_URL = "http://export.arxiv.org/api/query"
+ARXIV_API_URL = "https://export.arxiv.org/api/query"
 
 
 class MCPClientService:
@@ -20,7 +20,7 @@ class MCPClientService:
     """
 
     def __init__(self):
-        self.client = httpx.AsyncClient(timeout=30.0)
+        self.client = httpx.AsyncClient(timeout=30.0, follow_redirects=True)
 
     async def search_arxiv(
         self,
