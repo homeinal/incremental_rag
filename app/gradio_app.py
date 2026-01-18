@@ -1,13 +1,12 @@
 """Standalone Gradio UI Application"""
 
+import os
 import gradio as gr
 import httpx
 from typing import Tuple
 
-from app.config import get_settings
-
-settings = get_settings()
-API_BASE_URL = f"http://localhost:{settings.api_port}"
+# API URL from environment variable or default to deployed API
+API_BASE_URL = os.getenv("API_BASE_URL", "https://incremental-rag.onrender.com")
 
 
 def format_sources(sources: list) -> str:
@@ -195,8 +194,9 @@ with gr.Blocks(title="GuRag - AI Research Assistant", theme=gr.themes.Soft()) as
 
 
 if __name__ == "__main__":
+    port = int(os.getenv("PORT", "7860"))
     demo.launch(
         server_name="0.0.0.0",
-        server_port=settings.gradio_port,
+        server_port=port,
         share=False,
     )

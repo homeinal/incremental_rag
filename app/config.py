@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     gradio_port: int = 7860
+    api_base_url: str = "https://incremental-rag.onrender.com"  # Deployed API URL
 
     # Logging
     log_level: str = "INFO"
