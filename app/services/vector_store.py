@@ -44,10 +44,14 @@ class VectorStoreService:
         self,
         keywords: List[str],
         limit: Optional[int] = None,
+        min_similarity: float = 0.5,  # Minimum similarity threshold
     ) -> List[KnowledgeItem]:
         """
         Search knowledge base using keyword embeddings with time-weighted scoring.
         Final score = similarity * 0.7 + recency_score * 0.3
+
+        Returns empty list if no results meet min_similarity threshold,
+        allowing fallback to MCP external search.
         """
         if not keywords:
             return []
@@ -84,6 +88,11 @@ class VectorStoreService:
         items = []
         for row in rows:
             similarity = float(row["similarity"])
+
+            # Skip results below minimum similarity threshold
+            if similarity < min_similarity:
+                continue
+
             recency = calculate_recency_score(row["created_at"])
             final_score = similarity * 0.7 + recency * 0.3
 
@@ -106,7 +115,7 @@ class VectorStoreService:
         items.sort(key=lambda x: x.final_score, reverse=True)
         results = items[:limit]
 
-        logger.info(f"Vector search found {len(results)} results for keywords: {keywords}")
+        logger.info(f"Vector search found {len(results)} results (min_sim={min_similarity}) for keywords: {keywords}")
         return results
 
     async def ingest(self, item: MCPSearchResult) -> int:
