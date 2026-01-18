@@ -3,6 +3,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.config import get_settings
 from app.core.database import DatabasePool, init_db, health_check
@@ -59,6 +60,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+async def root():
+    """Redirect to API documentation"""
+    return RedirectResponse(url="/docs")
 
 
 @app.post("/search", response_model=SearchResponse)
